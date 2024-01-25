@@ -26,7 +26,7 @@ Installing pgcli
 pip install pgcli
 
 
-$ winpty docker run -it python:3.9
+$ e
 
 This is to enable python so i can install pandas
  winpty docker run -it --entrypoint=bash python:3.9
@@ -76,3 +76,84 @@ docker run -it \
   --network=pg-network \
   --name pgadmin-2 \
   dpage/pgadmin4
+
+
+'To create a new pg admin db in the container.
+
+docker run -it \
+  -e POSTGRES_USER=root \
+  -e POSTGRES_PASSWORD=test \
+  -e POSTGRES_DB=ny_taxi \
+  -v "C:\Users\techa\Music\data-engineering-zoomcamp\01-docker-terraform\2_docker_sql\ny_taxi_postgres_data:/var/lib/postgresql/data" \
+  -p 5432:5432 \
+  --name pg-database \
+  postgres:13
+
+
+Music/data-engineering-zoomcamp/01-docker-terraform/2_docker_sql 
+
+
+So I was trying to create pgcli but the solution to my probelm was not 
+pip install psyscopg2
+
+This was the solution 
+pip install "psycopg[binary,pool]"
+
+
+to access the pgcli
+pgcli -h localhost -p 5432 -u root -d ny_taxi
+
+
+e
+
+Edit
+PGCLI -connection failed: FATAL:  password authentication failed for user "root"
+The error above was faced continually despite inputting the correct password
+Solution
+Option 1: Stop the PostgreSQL service on Windows
+
+
+\dt is to show the list of tables 
+
+less --This can be used for checking the contents of the file 
+
+
+This command is to or move the first 100 rows of the data into a new file 
+head -n 100 yellow_tripdata_2021-01.csv > yellow_head.csv
+
+
+This command is used to count the number of lines in an excel file
+wc -l yellow_tripdata_2021-01.csv
+
+Wow. I just learnt this. It converts a pandas dataframe to sql ddl script
+print(pd.io.sql.get_schema(df,name = 'yellow_taxi_data'))
+
+It returned this output(DDL script)
+CREATE TABLE "yellow_taxi_data" (
+"VendorID" INTEGER,
+  "tpep_pickup_datetime" TEXT,
+  "tpep_dropoff_datetime" TEXT,
+  "passenger_count" INTEGER,
+  "trip_distance" REAL,
+  "RatecodeID" INTEGER,
+  "store_and_fwd_flag" TEXT,
+  "PULocationID" INTEGER,
+  "DOLocationID" INTEGER,
+  "payment_type" INTEGER,
+  "fare_amount" REAL,
+  "extra" REAL,
+  "mta_tax" REAL,
+  "tip_amount" REAL,
+  "tolls_amount" REAL,
+  "improvement_surcharge" REAL,
+  "total_amount" REAL,
+  "congestion_surcharge" REAL
+)
+
+Iterator
+In pandas, an iterator is an object that allows you to iterate over elements of a data structure, typically a Series or DataFram
+
+
+
+This code directly creates a table in postgres and inserts the data
+%time df.to_sql(name='yellow_taxi_data',con=engine,if_exists='append')
